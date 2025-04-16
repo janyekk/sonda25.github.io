@@ -5,31 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sonda Prezydencka 2025</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #f0f4f8;
       margin: 0;
       padding: 0;
     }
 
     .container {
-      max-width: 900px;
+      max-width: 600px;
       margin: auto;
       padding: 20px;
       background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
     }
 
     h1, h2 {
       text-align: center;
-      color: #333;
+      color: #222;
     }
 
     .candidate, .duel {
-      background-color: #f9f9f9;
+      background-color: #ffffff;
       margin: 15px 0;
       padding: 15px;
       border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid #ddd;
     }
 
     .candidate h3, .duel h3 {
@@ -37,6 +42,7 @@
     }
 
     .vote-button {
+      margin-top: 10px;
       padding: 10px 16px;
       background-color: #4CAF50;
       color: white;
@@ -77,6 +83,12 @@
     .text-center {
       text-align: center;
     }
+
+    @media screen and (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -88,16 +100,15 @@
 
     <div class="duel-section">
       <h2>II Tura: Trzaskowski vs Nawrocki</h2>
-      <div class="duel" id="duel1"></div>
+      <div id="duel1"></div>
 
       <h2>II Tura: Trzaskowski vs Mentzen</h2>
-      <div class="duel" id="duel2"></div>
+      <div id="duel2"></div>
     </div>
   </div>
 
   <script>
-    // I TURA
-    const candidates = [
+    let candidates = JSON.parse(localStorage.getItem("candidates")) || [
       { name: "Rafał Trzaskowski", votes: 8 },
       { name: "Karol Nawrocki", votes: 0 },
       { name: "Sławomir Mentzen", votes: 5 },
@@ -109,6 +120,17 @@
       { name: "Adrian Zandberg", votes: 0 },
       { name: "Niezdecydowany/a", votes: 2 }
     ];
+
+    let secondRound = JSON.parse(localStorage.getItem("secondRound")) || {
+      duel1: [
+        { name: "Trzaskowski", votes: 5 },
+        { name: "Nawrocki", votes: 4 }
+      ],
+      duel2: [
+        { name: "Trzaskowski", votes: 5 },
+        { name: "Mentzen", votes: 4 }
+      ]
+    };
 
     function updateMainSonda() {
       const totalVotes = candidates.reduce((sum, c) => sum + c.votes, 0);
@@ -133,22 +155,9 @@
 
     function voteMain(index) {
       candidates[index].votes += 1;
+      localStorage.setItem("candidates", JSON.stringify(candidates));
       updateMainSonda();
     }
-
-    updateMainSonda();
-
-    // II TURA - POJEDYNEK
-    const secondRound = {
-      duel1: [
-        { name: "Trzaskowski", votes: 5 },
-        { name: "Nawrocki", votes: 4 }
-      ],
-      duel2: [
-        { name: "Trzaskowski", votes: 5 },
-        { name: "Mentzen", votes: 4 }
-      ]
-    };
 
     function renderDuel(id, duel) {
       const total = duel[0].votes + duel[1].votes;
@@ -171,9 +180,11 @@
 
     function voteDuel(duelId, index) {
       secondRound[duelId][index].votes += 1;
+      localStorage.setItem("secondRound", JSON.stringify(secondRound));
       renderDuel(duelId, secondRound[duelId]);
     }
 
+    updateMainSonda();
     renderDuel("duel1", secondRound.duel1);
     renderDuel("duel2", secondRound.duel2);
   </script>
