@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sonda Prezydencka 2025</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+      background-color: white;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    .candidate, .duel {
+      background-color: #f9f9f9;
+      margin: 15px 0;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .candidate h3, .duel h3 {
+      margin: 0;
+    }
+
+    .vote-button {
+      padding: 10px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .vote-button:hover {
+      background-color: #45a049;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 15px;
+      background-color: #ddd;
+      border-radius: 5px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar span {
+      display: block;
+      height: 100%;
+      background-color: #4CAF50;
+    }
+
+    .percent {
+      font-size: 0.9em;
+      color: #555;
+      margin-top: 5px;
+    }
+
+    .duel-section {
+      margin-top: 50px;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Sonda Prezydencka 2025</h1>
+
+    <div id="candidates-container"></div>
+    <p class="text-center"><strong>Łącznie głosów: <span id="total-votes">0</span></strong></p>
+
+    <div class="duel-section">
+      <h2>II Tura: Trzaskowski vs Nawrocki</h2>
+      <div class="duel" id="duel1"></div>
+
+      <h2>II Tura: Trzaskowski vs Mentzen</h2>
+      <div class="duel" id="duel2"></div>
+    </div>
+  </div>
+
+  <script>
+    // I TURA
+    const candidates = [
+      { name: "Rafał Trzaskowski", votes: 8 },
+      { name: "Karol Nawrocki", votes: 0 },
+      { name: "Sławomir Mentzen", votes: 5 },
+      { name: "Szymon Hołownia", votes: 0 },
+      { name: "Magdalena Biejat", votes: 2 },
+      { name: "Krzysztof Stanowski", votes: 0 },
+      { name: "Grzegorz Braun", votes: 0 },
+      { name: "Marek Jakubiak", votes: 1 },
+      { name: "Adrian Zandberg", votes: 0 },
+      { name: "Niezdecydowany/a", votes: 2 }
+    ];
+
+    function updateMainSonda() {
+      const totalVotes = candidates.reduce((sum, c) => sum + c.votes, 0);
+      document.getElementById("total-votes").textContent = totalVotes;
+      const container = document.getElementById("candidates-container");
+      container.innerHTML = "";
+
+      candidates.forEach((candidate, index) => {
+        const percent = totalVotes ? ((candidate.votes / totalVotes) * 100).toFixed(1) : 0;
+
+        const div = document.createElement("div");
+        div.classList.add("candidate");
+        div.innerHTML = `
+          <h3>${candidate.name}</h3>
+          <button class="vote-button" onclick="voteMain(${index})">Głosuj</button>
+          <div class="progress-bar"><span style="width: ${percent}%"></span></div>
+          <p class="percent">${candidate.votes} głosów (${percent}%)</p>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function voteMain(index) {
+      candidates[index].votes += 1;
+      updateMainSonda();
+    }
+
+    updateMainSonda();
+
+    // II TURA - POJEDYNEK
+    const secondRound = {
+      duel1: [
+        { name: "Trzaskowski", votes: 5 },
+        { name: "Nawrocki", votes: 4 }
+      ],
+      duel2: [
+        { name: "Trzaskowski", votes: 5 },
+        { name: "Mentzen", votes: 4 }
+      ]
+    };
+
+    function renderDuel(id, duel) {
+      const total = duel[0].votes + duel[1].votes;
+      const div = document.getElementById(id);
+      div.innerHTML = "";
+
+      duel.forEach((cand, i) => {
+        const percent = total ? ((cand.votes / total) * 100).toFixed(1) : 0;
+        const el = document.createElement("div");
+        el.classList.add("duel");
+        el.innerHTML = `
+          <h3>${cand.name}</h3>
+          <button class="vote-button" onclick="voteDuel('${id}', ${i})">Głosuj</button>
+          <div class="progress-bar"><span style="width: ${percent}%"></span></div>
+          <p class="percent">${cand.votes} głosów (${percent}%)</p>
+        `;
+        div.appendChild(el);
+      });
+    }
+
+    function voteDuel(duelId, index) {
+      secondRound[duelId][index].votes += 1;
+      renderDuel(duelId, secondRound[duelId]);
+    }
+
+    renderDuel("duel1", secondRound.duel1);
+    renderDuel("duel2", secondRound.duel2);
+  </script>
+</body>
+</html>
